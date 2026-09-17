@@ -21,7 +21,7 @@ class FakeActivitiesCollection:
 
 
 class GetActivitiesTests(unittest.TestCase):
-    def test_filters_activities_for_all_levels_when_difficulty_is_all(self):
+    def test_filters_activities_without_specific_difficulty_when_difficulty_is_all(self):
         collection = FakeActivitiesCollection(
             [
                 {"_id": "Chess Club", "description": "Open to everyone"},
