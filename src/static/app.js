@@ -772,9 +772,8 @@ if (typeof document !== "undefined") {
 
       // Update current day filter and fetch activities
       currentDay = button.dataset.day;
-        fetchActivities();
-      });
-    }
+      fetchActivities();
+    });
   });
 
   // Add event listeners for time filter buttons
