@@ -21,7 +21,7 @@ class FakeActivitiesCollection:
 
 
 class GetActivitiesTests(unittest.TestCase):
-    def test_filters_activities_without_specific_difficulty_when_difficulty_is_all(self):
+    def test_filters_activities_without_specific_difficulty_when_difficulty_is_unspecified(self):
         collection = FakeActivitiesCollection(
             [
                 {"_id": "Chess Club", "description": "Open to everyone"},
@@ -29,7 +29,7 @@ class GetActivitiesTests(unittest.TestCase):
         )
 
         with patch.object(activities, "activities_collection", collection):
-            result = activities.get_activities(difficulty="all")
+            result = activities.get_activities(difficulty="unspecified")
 
         self.assertEqual(collection.last_query, {"difficulty": {"$exists": False}})
         self.assertEqual(
