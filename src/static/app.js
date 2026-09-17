@@ -282,7 +282,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function formatSchedule(details) {
     // If schedule_details is available, use the structured data
     if (details.schedule_details) {
-      const days = details.schedule_details.days.join(", ");
+      const { days, start_time: startTime24, end_time: endTime24 } =
+        details.schedule_details;
+
+      if (!days || !startTime24 || !endTime24) {
+        return details.schedule;
+      }
+
+      const formattedDays = days.join(", ");
 
       // Convert 24h time format to 12h AM/PM format for display
       const formatTime = (time24) => {
@@ -294,10 +301,10 @@ document.addEventListener("DOMContentLoaded", () => {
           .padStart(2, "0")} ${period}`;
       };
 
-      const startTime = formatTime(details.schedule_details.start_time);
-      const endTime = formatTime(details.schedule_details.end_time);
+      const startTime = formatTime(startTime24);
+      const endTime = formatTime(endTime24);
 
-      return `${days}, ${startTime} - ${endTime}`;
+      return `${formattedDays}, ${startTime} - ${endTime}`;
     }
 
     // Fallback to the string format if schedule_details isn't available
