@@ -30,6 +30,32 @@
   --error-light: #ffebee;
   --info: #0c5460;
   --info-light: #d1ecf1;
+  --control-bg: rgba(255, 255, 255, 0.2);
+  --control-bg-hover: rgba(255, 255, 255, 0.3);
+}
+
+:root[data-theme="dark"] {
+  --primary: #90caf9;
+  --primary-light: #bbdefb;
+  --primary-dark: #5d99c6;
+  --primary-text: #0f172a;
+  --secondary: #ffb74d;
+  --secondary-light: #ffd180;
+  --secondary-dark: #f57c00;
+  --secondary-text: #1f2937;
+  --background: #111827;
+  --surface: #1f2937;
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --border: #374151;
+  --border-light: #4b5563;
+  --border-focus: #93c5fd;
+  --success-light: #153b1f;
+  --warning-light: #4d3b0a;
+  --error-light: #4a1d1d;
+  --info-light: #16313f;
+  --control-bg: rgba(15, 23, 42, 0.25);
+  --control-bg-hover: rgba(15, 23, 42, 0.4);
 }
 
 * {
@@ -39,6 +65,11 @@
   font-family: Arial, sans-serif;
 }
 
+html {
+  background-color: var(--background);
+  transition: background-color 0.2s ease;
+}
+
 body {
   font-family: Arial, sans-serif;
   line-height: 1.4;
@@ -46,8 +77,12 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 12px;
+  min-height: 100vh;
   background-color: var(--background);
   font-size: 0.9rem;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 header {
@@ -296,6 +331,15 @@ button {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+input {
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+input::placeholder {
+  color: var(--text-secondary);
 }
 
 /* Tooltip styles */
@@ -617,6 +661,9 @@ footer {
   position: absolute;
   top: 10px;
   right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 #user-status {
@@ -639,7 +686,7 @@ footer {
   display: flex;
   align-items: center;
   gap: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--control-bg);
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 0.85rem;
@@ -647,7 +694,7 @@ footer {
 }
 
 .icon-button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--control-bg-hover);
 }
 
 .user-icon {
@@ -656,11 +703,20 @@ footer {
 
 #logout-button {
   padding: 3px 10px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--control-bg);
   font-size: 0.8rem;
   border-radius: 20px;
 }
 
 #logout-button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--control-bg-hover);
+}
+
+@media (max-width: 767px) {
+  #user-controls {
+    position: static;
+    margin-top: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 }
