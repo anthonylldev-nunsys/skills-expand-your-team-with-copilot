@@ -40,6 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  const sharedActivity =
+    new URLSearchParams(window.location.search).get("activity")?.trim() || "";
 
   // Authentication state
   let currentUser = null;
@@ -63,6 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const activeTimeFilter = document.querySelector(".time-filter.active");
     if (activeTimeFilter) {
       currentTimeRange = activeTimeFilter.dataset.time;
+    }
+
+    if (sharedActivity) {
+      searchQuery = sharedActivity;
+      searchInput.value = sharedActivity;
     }
   }
 
@@ -289,6 +296,73 @@ document.addEventListener("DOMContentLoaded", () => {
         return details.schedule;
       }
 
+      function buildShareUrl(activityName) {
+        const shareUrl = new URL(window.location.href);
+        shareUrl.searchParams.set("activity", activityName);
+        return shareUrl.toString();
+      }
+
+      function buildShareText(activityName, details) {
+        return `Check out ${activityName} at Mergington High School! ${formatSchedule(
+          details
+        )}. ${details.description}`;
+      }
+
+      async function copyTextToClipboard(text) {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          return;
+        }
+
+        const tempInput = document.createElement("input");
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+      }
+
+      function openShareWindow(url) {
+        window.open(url, "_blank", "noopener,noreferrer,width=640,height=560");
+      }
+
+      async function handleShare(platform, activityName, details) {
+        const shareUrl = buildShareUrl(activityName);
+        const shareText = buildShareText(activityName, details);
+
+        if (platform === "copy") {
+          await copyTextToClipboard(shareUrl);
+          showMessage(`Share link copied for ${activityName}.`, "success");
+          return;
+        }
+
+        if (platform === "email") {
+          const emailSubject = `Check out ${activityName}`;
+          const emailBody = `${shareText}\n\n${shareUrl}`;
+          window.location.href = `mailto:?subject=${encodeURIComponent(
+            emailSubject
+          )}&body=${encodeURIComponent(emailBody)}`;
+          return;
+        }
+
+        if (platform === "facebook") {
+          openShareWindow(
+            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+              shareUrl
+            )}`
+          );
+          return;
+        }
+
+        if (platform === "x") {
+          openShareWindow(
+            `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+              shareText
+            )}&url=${encodeURIComponent(shareUrl)}`
+          );
+        }
+      }
+
       const formattedDays = days.join(", ");
 
       // Convert 24h time format to 12h AM/PM format for display
@@ -483,6 +557,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
+    if (sharedActivity && sharedActivity.toLowerCase() === name.toLowerCase()) {
+      activityCard.classList.add("shared-activity");
+    }
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
@@ -535,6 +612,20 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="tooltip-text">Regular meetings at this time throughout the semester</span>
       </p>
       ${capacityIndicator}
+      <div class="share-actions" aria-label="Share ${name}">
+        <button class="share-button" data-platform="x" type="button">
+          Share on X
+        </button>
+        <button class="share-button" data-platform="facebook" type="button">
+          Share on Facebook
+        </button>
+        <button class="share-button" data-platform="email" type="button">
+          Email
+        </button>
+        <button class="share-button" data-platform="copy" type="button">
+          Copy Link
+        </button>
+      </div>
       <div class="participants-list">
         <h5>Current Participants:</h5>
         <ul>
@@ -582,6 +673,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteButtons = activityCard.querySelectorAll(".delete-participant");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
+    });
+
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", async () => {
+        try {
+          await handleShare(button.dataset.platform, name, details);
+        } catch (error) {
+          showMessage("Unable to share activity right now.", "error");
+          console.error("Error sharing activity:", error);
+        }
+      });
     });
 
     // Add click handler for register button (only when authenticated)
