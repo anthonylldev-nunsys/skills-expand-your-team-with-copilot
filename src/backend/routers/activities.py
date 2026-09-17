@@ -57,7 +57,7 @@ def get_activities(
                 "$or": [
                     {"difficulty": {"$exists": False}},
                     {"difficulty": None},
-                    {"difficulty": ""},
+                    {"difficulty": {"$regex": r"^\s*$"}},
                 ]
             }
             if query:

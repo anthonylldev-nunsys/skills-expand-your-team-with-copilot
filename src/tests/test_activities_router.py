@@ -37,7 +37,7 @@ class GetActivitiesTests(unittest.TestCase):
                 "$or": [
                     {"difficulty": {"$exists": False}},
                     {"difficulty": None},
-                    {"difficulty": ""},
+                    {"difficulty": {"$regex": r"^\s*$"}},
                 ]
             },
         )
@@ -82,9 +82,26 @@ class GetActivitiesTests(unittest.TestCase):
                         "$or": [
                             {"difficulty": {"$exists": False}},
                             {"difficulty": None},
-                            {"difficulty": ""},
+                            {"difficulty": {"$regex": r"^\s*$"}},
                         ]
                     },
+                ]
+            },
+        )
+
+    def test_treats_unspecified_difficulty_case_insensitively(self):
+        collection = FakeActivitiesCollection([])
+
+        with patch.object(activities, "activities_collection", collection):
+            activities.get_activities(difficulty="Unspecified")
+
+        self.assertEqual(
+            collection.last_query,
+            {
+                "$or": [
+                    {"difficulty": {"$exists": False}},
+                    {"difficulty": None},
+                    {"difficulty": {"$regex": r"^\s*$"}},
                 ]
             },
         )
