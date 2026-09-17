@@ -9,10 +9,15 @@ function buildActivityShareUrl(currentUrl, activityName) {
   return shareUrl.toString();
 }
 
+function isSharedActivityMatch(sharedActivity, activityName) {
+  return sharedActivity.toLowerCase() === activityName.toLowerCase();
+}
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     getSharedActivityFromLocationSearch,
     buildActivityShareUrl,
+    isSharedActivityMatch,
   };
 }
 
@@ -587,7 +592,13 @@ if (typeof document !== "undefined") {
     const sharedActivityCard = document.querySelector(".shared-activity");
     if (sharedActivityCard && !hasScrolledToSharedActivity) {
       hasScrolledToSharedActivity = true;
-      sharedActivityCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      sharedActivityCard.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "center",
+      });
     }
   }
 
@@ -595,7 +606,7 @@ if (typeof document !== "undefined") {
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
-    if (sharedActivity && sharedActivity.toLowerCase() === name.toLowerCase()) {
+    if (sharedActivity && isSharedActivityMatch(sharedActivity, name)) {
       activityCard.classList.add("shared-activity");
     }
 
