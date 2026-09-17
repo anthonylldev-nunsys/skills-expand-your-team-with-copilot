@@ -67,6 +67,28 @@ class GetActivitiesTests(unittest.TestCase):
             },
         )
 
+    def test_combines_unspecified_difficulty_with_other_filters(self):
+        collection = FakeActivitiesCollection([])
+
+        with patch.object(activities, "activities_collection", collection):
+            activities.get_activities(day="Tuesday", difficulty="unspecified")
+
+        self.assertEqual(
+            collection.last_query,
+            {
+                "$and": [
+                    {"schedule_details.days": {"$in": ["Tuesday"]}},
+                    {
+                        "$or": [
+                            {"difficulty": {"$exists": False}},
+                            {"difficulty": None},
+                            {"difficulty": ""},
+                        ]
+                    },
+                ]
+            },
+        )
+
     def test_rejects_unknown_difficulty_levels(self):
         with self.assertRaises(HTTPException) as context:
             activities.get_activities(difficulty="expert")
