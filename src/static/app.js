@@ -564,6 +564,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </span>
     `
       : "";
+    const difficultyAssistiveText = difficultyInfo
+      ? `<p class="sr-only">Difficulty level: ${difficultyInfo.label}</p>`
+      : "";
 
     // Create capacity indicator
     const capacityIndicator = `
@@ -579,10 +582,11 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     activityCard.innerHTML = `
-      <div class="activity-tags">
+      <div class="activity-tags" aria-hidden="true">
         ${categoryTagHtml}
         ${difficultyTagHtml}
       </div>
+      ${difficultyAssistiveText}
       <h4>${name}</h4>
       <p>${details.description}</p>
       <p class="tooltip">
