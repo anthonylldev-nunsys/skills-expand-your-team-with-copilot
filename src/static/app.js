@@ -13,11 +13,33 @@ function isSharedActivityMatch(sharedActivity, activityName) {
   return sharedActivity.toLowerCase() === activityName.toLowerCase();
 }
 
+function getActivityCardClassName(sharedActivity, activityName) {
+  return sharedActivity && isSharedActivityMatch(sharedActivity, activityName)
+    ? "activity-card shared-activity"
+    : "activity-card";
+}
+
+function sanitizeShareText(value) {
+  if (!value) {
+    return "";
+  }
+
+  if (typeof document === "undefined") {
+    return String(value).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  const sanitizedContainer = document.createElement("div");
+  sanitizedContainer.innerHTML = String(value);
+  return sanitizedContainer.textContent.replace(/\s+/g, " ").trim();
+}
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     getSharedActivityFromLocationSearch,
     buildActivityShareUrl,
     isSharedActivityMatch,
+    getActivityCardClassName,
+    sanitizeShareText,
   };
 }
 
@@ -345,7 +367,8 @@ if (typeof document !== "undefined") {
   }
 
   function buildShareText(activityName, details) {
-    const description = details.description ? ` ${details.description}` : "";
+    const descriptionText = sanitizeShareText(details.description);
+    const description = descriptionText ? ` ${descriptionText}` : "";
     return `Check out ${activityName} at Mergington High School! ${formatSchedule(
       details
     )}.${description}`;
@@ -601,10 +624,7 @@ if (typeof document !== "undefined") {
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
-    activityCard.className = "activity-card";
-    if (sharedActivity && isSharedActivityMatch(sharedActivity, name)) {
-      activityCard.classList.add("shared-activity");
-    }
+    activityCard.className = getActivityCardClassName(sharedActivity, name);
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
@@ -657,7 +677,7 @@ if (typeof document !== "undefined") {
         <span class="tooltip-text">Regular meetings at this time throughout the semester</span>
       </p>
       ${capacityIndicator}
-      <div class="share-actions" role="group" aria-label="Share ${name}">
+      <div class="share-actions" role="group">
         <button class="share-button" data-platform="x" type="button">
           Share on X
         </button>
@@ -719,6 +739,9 @@ if (typeof document !== "undefined") {
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
     });
+
+    const shareActions = activityCard.querySelector(".share-actions");
+    shareActions.setAttribute("aria-label", `Share ${name}`);
 
     const shareButtons = activityCard.querySelectorAll(".share-button");
     shareButtons.forEach((button) => {

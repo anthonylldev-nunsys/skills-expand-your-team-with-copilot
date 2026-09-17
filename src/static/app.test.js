@@ -5,6 +5,8 @@ const {
   getSharedActivityFromLocationSearch,
   buildActivityShareUrl,
   isSharedActivityMatch,
+  getActivityCardClassName,
+  sanitizeShareText,
 } = require("./app.js");
 
 test("returns the shared activity when the query parameter is present", () => {
@@ -51,4 +53,22 @@ test("replaces an existing activity query parameter when building share URLs", (
 
 test("matches shared activities case-insensitively", () => {
   assert.equal(isSharedActivityMatch("chess club", "Chess Club"), true);
+});
+
+test("marks only the matching card as shared", () => {
+  assert.equal(
+    getActivityCardClassName("chess club", "Chess Club"),
+    "activity-card shared-activity"
+  );
+  assert.equal(
+    getActivityCardClassName("chess club", "Drama Club"),
+    "activity-card"
+  );
+});
+
+test("strips markup from share text values", () => {
+  assert.equal(
+    sanitizeShareText("Build <strong>robots</strong> with friends"),
+    "Build robots with friends"
+  );
 });
