@@ -226,9 +226,6 @@ section h3 {
 
 /* Activity Tag */
 .activity-tag {
-  position: absolute;
-  top: 8px;
-  right: 8px;
   background: #e8eaf6;
   color: #3949ab;
   font-size: 0.65rem;
@@ -237,6 +234,11 @@ section h3 {
   border-radius: 10px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+}
+
+.difficulty-tag {
+  background: #fff3e0;
+  color: #e65100;
 }
 
 /* Capacity Indicator */
@@ -572,6 +574,7 @@ footer {
 }
 
 .category-filters,
+.difficulty-filters,
 .day-filters,
 .time-filters {
   display: flex;
@@ -580,6 +583,7 @@ footer {
 }
 
 .category-filter,
+.difficulty-filter,
 .day-filter,
 .time-filter {
   background-color: var(--background);
@@ -593,6 +597,7 @@ footer {
 }
 
 .category-filter.active,
+.difficulty-filter.active,
 .day-filter.active,
 .time-filter.active {
   background-color: var(--primary);
@@ -601,10 +606,33 @@ footer {
 }
 
 .category-filter:hover,
+.difficulty-filter:hover,
 .day-filter:hover,
 .time-filter:hover {
   background-color: var(--primary-light);
   color: white;
+}
+
+.activity-tags {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .time-filters {
