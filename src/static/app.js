@@ -93,10 +93,6 @@ if (typeof document !== "undefined") {
       currentTimeRange = activeTimeFilter.dataset.time;
     }
 
-    if (sharedActivity) {
-      searchQuery = sharedActivity;
-      searchInput.value = sharedActivity;
-    }
   }
 
   // Function to set day filter
