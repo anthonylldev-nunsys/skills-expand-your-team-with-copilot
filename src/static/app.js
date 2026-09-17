@@ -296,73 +296,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return details.schedule;
       }
 
-      function buildShareUrl(activityName) {
-        const shareUrl = new URL(window.location.href);
-        shareUrl.searchParams.set("activity", activityName);
-        return shareUrl.toString();
-      }
-
-      function buildShareText(activityName, details) {
-        return `Check out ${activityName} at Mergington High School! ${formatSchedule(
-          details
-        )}. ${details.description}`;
-      }
-
-      async function copyTextToClipboard(text) {
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(text);
-          return;
-        }
-
-        const tempInput = document.createElement("input");
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempInput);
-      }
-
-      function openShareWindow(url) {
-        window.open(url, "_blank", "noopener,noreferrer,width=640,height=560");
-      }
-
-      async function handleShare(platform, activityName, details) {
-        const shareUrl = buildShareUrl(activityName);
-        const shareText = buildShareText(activityName, details);
-
-        if (platform === "copy") {
-          await copyTextToClipboard(shareUrl);
-          showMessage(`Share link copied for ${activityName}.`, "success");
-          return;
-        }
-
-        if (platform === "email") {
-          const emailSubject = `Check out ${activityName}`;
-          const emailBody = `${shareText}\n\n${shareUrl}`;
-          window.location.href = `mailto:?subject=${encodeURIComponent(
-            emailSubject
-          )}&body=${encodeURIComponent(emailBody)}`;
-          return;
-        }
-
-        if (platform === "facebook") {
-          openShareWindow(
-            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              shareUrl
-            )}`
-          );
-          return;
-        }
-
-        if (platform === "x") {
-          openShareWindow(
-            `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-              shareText
-            )}&url=${encodeURIComponent(shareUrl)}`
-          );
-        }
-      }
-
       const formattedDays = days.join(", ");
 
       // Convert 24h time format to 12h AM/PM format for display
@@ -383,6 +316,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fallback to the string format if schedule_details isn't available
     return details.schedule;
+  }
+
+  function buildShareUrl(activityName) {
+    const shareUrl = new URL(window.location.href);
+    shareUrl.searchParams.set("activity", activityName);
+    return shareUrl.toString();
+  }
+
+  function buildShareText(activityName, details) {
+    return `Check out ${activityName} at Mergington High School! ${formatSchedule(
+      details
+    )}. ${details.description}`;
+  }
+
+  async function copyTextToClipboard(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const tempInput = document.createElement("input");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+  }
+
+  function openShareWindow(url) {
+    window.open(url, "_blank", "noopener,noreferrer,width=640,height=560");
+  }
+
+  async function handleShare(platform, activityName, details) {
+    const shareUrl = buildShareUrl(activityName);
+    const shareText = buildShareText(activityName, details);
+
+    if (platform === "copy") {
+      await copyTextToClipboard(shareUrl);
+      showMessage(`Share link copied for ${activityName}.`, "success");
+      return;
+    }
+
+    if (platform === "email") {
+      const emailSubject = `Check out ${activityName}`;
+      const emailBody = `${shareText}\n\n${shareUrl}`;
+      window.location.href = `mailto:?subject=${encodeURIComponent(
+        emailSubject
+      )}&body=${encodeURIComponent(emailBody)}`;
+      return;
+    }
+
+    if (platform === "facebook") {
+      openShareWindow(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          shareUrl
+        )}`
+      );
+      return;
+    }
+
+    if (platform === "x") {
+      openShareWindow(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          shareText
+        )}&url=${encodeURIComponent(shareUrl)}`
+      );
+    }
   }
 
   // Function to determine activity type (this would ideally come from backend)
@@ -551,6 +551,11 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+
+    const sharedActivityCard = document.querySelector(".shared-activity");
+    if (sharedActivityCard) {
+      sharedActivityCard.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }
 
   // Function to render a single activity card

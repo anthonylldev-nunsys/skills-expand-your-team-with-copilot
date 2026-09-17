@@ -163,6 +163,11 @@ section h3 {
   font-size: 0.85rem;
 }
 
+.activity-card.shared-activity {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(255, 111, 0, 0.15);
+}
+
 .activity-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -187,7 +192,36 @@ section h3 {
   margin-top: auto;
   padding-top: 10px;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
   justify-content: center;
+}
+
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.share-button {
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+}
+
+.share-button:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
+  color: var(--primary-text);
+}
+
+.auth-notice {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 /* Activity Tag */
