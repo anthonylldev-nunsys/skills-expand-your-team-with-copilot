@@ -1,4 +1,23 @@
-document.addEventListener("DOMContentLoaded", () => {
+function getSharedActivityFromLocationSearch(locationSearch) {
+  return new URLSearchParams(locationSearch).get("activity")?.trim() || "";
+}
+
+function buildActivityShareUrl(currentUrl, activityName) {
+  const currentPageUrl = new URL(currentUrl);
+  const shareUrl = new URL(currentPageUrl.origin + currentPageUrl.pathname);
+  shareUrl.searchParams.set("activity", activityName);
+  return shareUrl.toString();
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    getSharedActivityFromLocationSearch,
+    buildActivityShareUrl,
+  };
+}
+
+if (typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
   const activitiesList = document.getElementById("activities-list");
   const messageDiv = document.getElementById("message");
@@ -41,8 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentDay = "";
   let currentTimeRange = "";
   let hasScrolledToSharedActivity = false;
-  const sharedActivity =
-    new URLSearchParams(window.location.search).get("activity")?.trim() || "";
+  const sharedActivity = getSharedActivityFromLocationSearch(
+    window.location.search
+  );
 
   // Authentication state
   let currentUser = null;
@@ -320,9 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function buildShareUrl(activityName) {
-    const shareUrl = new URL(window.location.origin + window.location.pathname);
-    shareUrl.searchParams.set("activity", activityName);
-    return shareUrl.toString();
+    return buildActivityShareUrl(window.location.href, activityName);
   }
 
   function buildShareText(activityName, details) {
@@ -392,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (platform === "x") {
       openShareWindow(
-        `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        `https://x.com/intent/tweet?text=${encodeURIComponent(
           shareText
         )}&url=${encodeURIComponent(shareUrl)}`
       );
@@ -754,8 +772,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Update current day filter and fetch activities
       currentDay = button.dataset.day;
-      fetchActivities();
-    });
+        fetchActivities();
+      });
+    }
   });
 
   // Add event listeners for time filter buttons
