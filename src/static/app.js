@@ -326,9 +326,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function buildShareText(activityName, details) {
+    const description = details.description ? ` ${details.description}` : "";
     return `Check out ${activityName} at Mergington High School! ${formatSchedule(
       details
-    )}. ${details.description}`;
+    )}.${description}`;
   }
 
   async function copyTextToClipboard(text) {
@@ -341,12 +342,24 @@ document.addEventListener("DOMContentLoaded", () => {
     tempInput.value = text;
     document.body.appendChild(tempInput);
     tempInput.select();
-    document.execCommand("copy");
+    const didCopy = document.execCommand("copy");
     document.body.removeChild(tempInput);
+
+    if (!didCopy) {
+      throw new Error("Copy command was blocked");
+    }
   }
 
   function openShareWindow(url) {
-    window.open(url, "_blank", "noopener,noreferrer,width=640,height=560");
+    const shareWindow = window.open(
+      url,
+      "_blank",
+      "noopener,noreferrer,width=640,height=560"
+    );
+
+    if (!shareWindow) {
+      throw new Error("Popup blocked");
+    }
   }
 
   async function handleShare(platform, activityName, details) {
