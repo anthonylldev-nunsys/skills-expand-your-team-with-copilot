@@ -1013,4 +1013,5 @@ if (typeof document !== "undefined") {
   checkAuthentication();
   initializeFilters();
   fetchActivities();
-});
+  });
+}
