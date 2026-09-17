@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("activity-search");
   const searchButton = document.getElementById("search-button");
   const categoryFilters = document.querySelectorAll(".category-filter");
+  const difficultyFilters = document.querySelectorAll(".difficulty-filter");
   const dayFilters = document.querySelectorAll(".day-filter");
   const timeFilters = document.querySelectorAll(".time-filter");
 
@@ -33,10 +34,28 @@ document.addEventListener("DOMContentLoaded", () => {
     community: { label: "Community", color: "#fff3e0", textColor: "#e65100" },
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
+  const difficultyTypes = {
+    beginner: {
+      label: "Beginner",
+      color: "#e8f5e9",
+      textColor: "#2e7d32",
+    },
+    intermediate: {
+      label: "Intermediate",
+      color: "#fff8e1",
+      textColor: "#f57f17",
+    },
+    advanced: {
+      label: "Advanced",
+      color: "#ffebee",
+      textColor: "#c62828",
+    },
+  };
 
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
+  let currentDifficulty = "";
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
@@ -64,6 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (activeTimeFilter) {
       currentTimeRange = activeTimeFilter.dataset.time;
     }
+
+    const activeDifficultyFilter = document.querySelector(
+      ".difficulty-filter.active"
+    );
+    if (activeDifficultyFilter) {
+      currentDifficulty = activeDifficultyFilter.dataset.difficulty;
+    }
   }
 
   // Function to set day filter
@@ -89,6 +115,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // Update active class
     timeFilters.forEach((btn) => {
       if (btn.dataset.time === timeRange) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+
+    fetchActivities();
+  }
+
+  function setDifficultyFilter(difficulty) {
+    currentDifficulty = difficulty;
+
+    difficultyFilters.forEach((btn) => {
+      if (btn.dataset.difficulty === difficulty) {
         btn.classList.add("active");
       } else {
         btn.classList.remove("active");
@@ -399,6 +439,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
+      if (currentDifficulty) {
+        queryParams.push(`difficulty=${encodeURIComponent(currentDifficulty)}`);
+      }
+
       const queryString =
         queryParams.length > 0 ? `?${queryParams.join("&")}` : "";
       const response = await fetch(`/activities${queryString}`);
@@ -502,16 +546,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // Determine activity type
     const activityType = getActivityType(name, details.description);
     const typeInfo = activityTypes[activityType];
+    const difficultyInfo = difficultyTypes[details.difficulty];
 
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
 
     // Create activity tag
-    const tagHtml = `
+    const categoryTagHtml = `
       <span class="activity-tag" style="background-color: ${typeInfo.color}; color: ${typeInfo.textColor}">
         ${typeInfo.label}
       </span>
     `;
+    const difficultyTagHtml = difficultyInfo
+      ? `
+      <span class="activity-tag difficulty-tag" style="background-color: ${difficultyInfo.color}; color: ${difficultyInfo.textColor}">
+        ${difficultyInfo.label}
+      </span>
+    `
+      : "";
+    const difficultyAssistiveText = difficultyInfo
+      ? `<p class="sr-only">Difficulty level: ${difficultyInfo.label}</p>`
+      : "";
 
     // Create capacity indicator
     const capacityIndicator = `
@@ -527,7 +582,11 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     activityCard.innerHTML = `
-      ${tagHtml}
+      <div class="activity-tags" aria-hidden="true">
+        ${categoryTagHtml}
+        ${difficultyTagHtml}
+      </div>
+      ${difficultyAssistiveText}
       <h4>${name}</h4>
       <p>${details.description}</p>
       <p class="tooltip">
@@ -619,6 +678,12 @@ document.addEventListener("DOMContentLoaded", () => {
       // Update current filter and display filtered activities
       currentFilter = button.dataset.category;
       displayFilteredActivities();
+    });
+  });
+
+  difficultyFilters.forEach((button) => {
+    button.addEventListener("click", () => {
+      setDifficultyFilter(button.dataset.difficulty);
     });
   });
 
@@ -864,6 +929,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Expose filter functions to window for future UI control
   window.activityFilters = {
+    setDifficultyFilter,
     setDayFilter,
     setTimeRangeFilter,
   };
