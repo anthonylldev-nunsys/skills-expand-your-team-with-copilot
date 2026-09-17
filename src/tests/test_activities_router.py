@@ -31,7 +31,16 @@ class GetActivitiesTests(unittest.TestCase):
         with patch.object(activities, "activities_collection", collection):
             result = activities.get_activities(difficulty="unspecified")
 
-        self.assertEqual(collection.last_query, {"difficulty": {"$exists": False}})
+        self.assertEqual(
+            collection.last_query,
+            {
+                "$or": [
+                    {"difficulty": {"$exists": False}},
+                    {"difficulty": None},
+                    {"difficulty": ""},
+                ]
+            },
+        )
         self.assertEqual(
             result,
             {"Chess Club": {"description": "Open to everyone"}},

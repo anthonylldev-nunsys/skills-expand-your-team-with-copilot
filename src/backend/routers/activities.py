@@ -53,7 +53,11 @@ def get_activities(
             raise HTTPException(status_code=400, detail="Invalid difficulty level")
 
         if normalized_difficulty == "unspecified":
-            query["difficulty"] = {"$exists": False}
+            query["$or"] = [
+                {"difficulty": {"$exists": False}},
+                {"difficulty": None},
+                {"difficulty": ""},
+            ]
         else:
             query["difficulty"] = normalized_difficulty
     
