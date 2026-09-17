@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let hasScrolledToSharedActivity = false;
   const sharedActivity =
     new URLSearchParams(window.location.search).get("activity")?.trim() || "";
 
@@ -319,7 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function buildShareUrl(activityName) {
-    const shareUrl = new URL(window.location.href);
+    const shareUrl = new URL(window.location.origin + window.location.pathname);
     shareUrl.searchParams.set("activity", activityName);
     return shareUrl.toString();
   }
@@ -553,7 +554,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const sharedActivityCard = document.querySelector(".shared-activity");
-    if (sharedActivityCard) {
+    if (sharedActivityCard && !hasScrolledToSharedActivity) {
+      hasScrolledToSharedActivity = true;
       sharedActivityCard.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
@@ -617,7 +619,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="tooltip-text">Regular meetings at this time throughout the semester</span>
       </p>
       ${capacityIndicator}
-      <div class="share-actions" aria-label="Share ${name}">
+      <div class="share-actions" role="group" aria-label="Share ${name}">
         <button class="share-button" data-platform="x" type="button">
           Share on X
         </button>
